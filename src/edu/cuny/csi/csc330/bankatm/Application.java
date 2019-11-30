@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Application extends JFrame
 {
@@ -31,6 +32,20 @@ public class Application extends JFrame
     }
 
     public static void main(final String[] args) {
-        Application app = new Application();
+//        Application app = new Application();
+
+        Database db = new Database();
+        if (db.open("bankdata")) {
+            System.out.println("Bank data: ");
+
+            ArrayList<BankAccount> accts = db.getAccounts();
+            System.out.println("--SEP--");
+            for (BankAccount acct : accts) {
+                System.out.printf("Account of %s (id #%d) balance: %s\n", acct.getName(), acct.getId(), acct.getFormattedBalance());
+            }
+
+            BankAccount ba = db.authenticateAccount(1, "0123");
+            System.out.println("Test Authentication: " + (ba == null ? "Failed" : ba.getName() + " authenticated"));
+        }
     }
 }
