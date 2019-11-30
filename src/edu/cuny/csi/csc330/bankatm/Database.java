@@ -79,13 +79,21 @@ public class Database
         return bankAccounts;
     }
 
-    public BankAccount authenticateAccount(int acctNumber, String pin) {
+    public BankAccount authenticateAccount(String acctNumber, String pin) {
         String sql = "SELECT id, name, balance FROM accounts WHERE id = ? and pin = ?";
 
         try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql))
         {
             // set the value
-            pstmt.setInt(1, acctNumber);
+            int acctNumberInt = 0;
+            try {
+                acctNumberInt = Integer.parseInt(acctNumber);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            pstmt.setInt(1, acctNumberInt);
             pstmt.setString(2, pin);
 
             ResultSet rs  = pstmt.executeQuery();
@@ -102,5 +110,27 @@ public class Database
         }
 
         return null;
+    }
+
+    public BankAccount createAccount(String name, String pin, int initialDeposit)
+    {
+        String accountNumber = "";
+
+        String sql = "INSERT INTO accounts (name, pin, balance) VALUES(?, ?, ?)";
+        try {
+            try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, pin);
+                pstmt.setInt(3, initialDeposit);
+
+                pstmt.executeUpdate();
+                ResultSet genky = pstmt.getGeneratedKeys();
+                accountNumber = Long.toString(genky.getLong(1));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return authenticateAccount(accountNumber, pin);
     }
 }

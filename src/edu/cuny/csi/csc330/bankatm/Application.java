@@ -2,14 +2,21 @@ package edu.cuny.csi.csc330.bankatm;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class Application extends JFrame
 {
-    public Application() {
-        super("Hello");
+    private Database db = new Database();
+    private boolean authenticated = false;
+    private BankAccount bankAccount = null;
+
+    public Application()
+    {
+        super("BankATM Machine");
+
+        if (!db.open("bankdata")) {
+            throw new RuntimeException("Failed to connect to SQLite");
+        }
+
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setLayout(new FlowLayout());
 
@@ -17,35 +24,58 @@ public class Application extends JFrame
         this.add(new JLabel("Hello, world!"));
 
         JButton button = new JButton("Press me!");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(button, "Hello World!");
-            }
-        });
+        button.addActionListener(e -> JOptionPane.showMessageDialog(button, "Hello World!"));
         this.add(button);
 
-        // Arrange the components inside the window
         this.pack();
 
-        // By default, the window is not visible. Make it visible.
+        this.logout();
+    }
+
+    public void logout() {
+        authenticated = false;
+        bankAccount = null;
+
+        int dialogResult = JOptionPane.showConfirmDialog (this, "Are you an existing customer?","Existing Customer", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            displayLoginDialog();
+        } else {
+            displayNewCustomerDialog();
+        }
+    }
+
+    private void displayLoginDialog()
+    {
+        String accountNumber = NumberDialog.showDialog("Account Number", "Enter your Account Number");
+        if (accountNumber.isEmpty()) {
+            logout();
+            return;
+        }
+
+        String pinNumber = NumberDialog.showDialog("Pin Number", "Enter your Pin Number");
+
+        BankAccount ba = db.authenticateAccount(accountNumber, pinNumber);
+        if (ba == null) {
+            System.out.println("Authentication Failed");
+            logout();
+            return;
+        }
+
+        bankAccount = ba;
+        authenticated = true;
+        System.out.println("Logged in to " + ba.getName());
+        System.out.println("Balance: " + ba.getFormattedBalance());
         this.setVisible(true);
     }
 
+    private void displayNewCustomerDialog()
+    {
+        // TODO(*): needs to be implemented
+
+        // BankAccount bankAcct = db.createAccount("test", "0123", 1795);
+    }
+
     public static void main(final String[] args) {
-//        Application app = new Application();
-
-        Database db = new Database();
-        if (db.open("bankdata")) {
-            System.out.println("Bank data: ");
-
-            ArrayList<BankAccount> accts = db.getAccounts();
-            System.out.println("--SEP--");
-            for (BankAccount acct : accts) {
-                System.out.printf("Account of %s (id #%d) balance: %s\n", acct.getName(), acct.getId(), acct.getFormattedBalance());
-            }
-
-            BankAccount ba = db.authenticateAccount(1, "0123");
-            System.out.println("Test Authentication: " + (ba == null ? "Failed" : ba.getName() + " authenticated"));
-        }
+        Application app = new Application();
     }
 }
