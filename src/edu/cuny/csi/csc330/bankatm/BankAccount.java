@@ -4,30 +4,46 @@ import java.text.NumberFormat;
 
 public class BankAccount
 {
+    public enum AccountType {
+        None,
+        Checking,
+        Savings
+    };
+
+    public static AccountType getAccountType(String accountType) {
+        switch (accountType.toLowerCase()) {
+            case "checking":    return AccountType.Checking;
+            case "savings":      return AccountType.Savings;
+            default:            return AccountType.None;
+        }
+    }
+
     private int id;
-    private int balance;
+    private int checkingBalance;
+    private int savingsBalance;
     private String name;
 
-    public BankAccount(int id, String name, int balance)
+    public BankAccount(int id, String name, int checking, int saving)
     {
         this.id = id;
         this.name = name;
-        this.balance = balance;
-    }
-
-    public int getBalance() {
-        return balance;
+        this.checkingBalance = checking;
+        this.savingsBalance = saving;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getFormattedBalance() {
-        return NumberFormat.getCurrencyInstance().format(balance / 100.0);
-    }
-
     public String getName() {
         return name;
+    }
+
+    public int getBalance(AccountType accountType) {
+        return (accountType == AccountType.Checking ? this.checkingBalance : this.savingsBalance);
+    }
+
+    public String getFormattedBalance(AccountType accountType) {
+        return NumberFormat.getCurrencyInstance().format(getBalance(accountType) / 100.0);
     }
 }

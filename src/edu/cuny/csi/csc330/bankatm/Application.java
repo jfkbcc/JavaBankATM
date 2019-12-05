@@ -1,5 +1,6 @@
 package edu.cuny.csi.csc330.bankatm;
 
+import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
 import edu.cuny.csi.csc330.bankatm.panels.BankAccountPanel;
 import edu.cuny.csi.csc330.bankatm.panels.SelectAccountTypePanel;
 import edu.cuny.csi.csc330.bankatm.panels.LoginPanel;
@@ -67,17 +68,17 @@ public class Application extends JFrame
         panel.setActionExit(e -> logout());
         panel.setActionSelected(e -> {
             String selected = e.getActionCommand();
-            displayBankScreen(selected);
+            displayBankScreen(BankAccount.getAccountType(selected));
         });
 
         this.setContentPanel(panel);
     }
 
-    private void displayBankScreen(String accountType)
+    private void displayBankScreen(AccountType accountType)
     {
-        if (!(accountType == "checking" || accountType == "savings")) {
+        if (accountType == AccountType.None) {
             logout();
-            System.err.println("Invalid bank account type `" + accountType + "`, valid account types: checking, savings");
+            System.err.println("Invalid bank account type `" + accountType.toString() + "`, valid account types: checking, savings");
             return;
         }
 
@@ -87,7 +88,7 @@ public class Application extends JFrame
         }
 
         BankAccountPanel panel = new BankAccountPanel(bankAccount, accountType);
-        panel.setActionExit(e -> logout());
+        panel.setActionExit(e -> displayAccountSelection());
         panel.setActionSelected(e -> {
             String cmdType = e.getActionCommand();
             System.out.println("Action `" + cmdType + "` button clicked!");
@@ -116,7 +117,7 @@ public class Application extends JFrame
         authenticated = true;
 
         System.out.println("Logged in to " + ba.getName());
-        System.out.println("Balance: " + ba.getFormattedBalance());
+        System.out.println("Balance: " + ba.getFormattedBalance(AccountType.Checking));
 
         displayAccountSelection();
     }

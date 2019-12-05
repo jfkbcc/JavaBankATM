@@ -12,7 +12,7 @@ public class BankAccountPanel extends JPanel
     private JButton btnDeposit;
     private JButton btnExit;
 
-    public BankAccountPanel(BankAccount bankAccount, String accountType)
+    public BankAccountPanel(BankAccount bankAccount, BankAccount.AccountType accountType)
     {
         super();
 
@@ -35,7 +35,7 @@ public class BankAccountPanel extends JPanel
         btnDeposit.setActionCommand("deposit");
         this.add(btnDeposit);
 
-        btnExit = new JButton("Quit");
+        btnExit = new JButton("Go Back");
         btnExit.setForeground(new Color(0, 0, 128));
         btnExit.setBackground(UIManager.getColor("Button.background"));
         btnExit.setFont(new Font("DialogInput", Font.BOLD, 14));
@@ -48,7 +48,7 @@ public class BankAccountPanel extends JPanel
         lblNewLabel.setBounds(10, 0, 414, 65);
         this.add(lblNewLabel);
 
-        JLabel lblNewLabel2 = new JLabel("Available Balance: " + bankAccount.getFormattedBalance());
+        JLabel lblNewLabel2 = new JLabel("Available Balance: " + bankAccount.getFormattedBalance(accountType));
         lblNewLabel2.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel2.setFont(new Font("Tahoma", Font.PLAIN, 14));
         lblNewLabel2.setBounds(10, 45, 414, 25);
@@ -71,9 +71,9 @@ public class BankAccountPanel extends JPanel
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    BankAccount ba = new BankAccount(1, "joey", 1500);
+                    BankAccount ba = new BankAccount(1, "joey", 1500, 300);
 
-                    BankAccountPanel window = new BankAccountPanel(ba, "checking");
+                    BankAccountPanel window = new BankAccountPanel(ba, BankAccount.AccountType.Checking);
 
                     JFrame frame = new JFrame();
                     frame.setBounds(100, 100, 450, 300);

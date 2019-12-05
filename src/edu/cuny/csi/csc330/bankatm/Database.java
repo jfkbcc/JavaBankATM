@@ -48,7 +48,7 @@ public class Database
     }
 
     public ArrayList<BankAccount> getAccounts() {
-        String sql = "SELECT id, name, balance FROM accounts WHERE id > ?";
+        String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id > ?";
 
         ArrayList<BankAccount> bankAccounts = new ArrayList<BankAccount>();
 
@@ -63,14 +63,15 @@ public class Database
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                int balance = rs.getInt("balance");
+                int checking_balance = rs.getInt("balance");
+                int saving_balance = rs.getInt("balance_saving");
 
-                BankAccount bankAccount = new BankAccount(id, name, balance);
+                BankAccount bankAccount = new BankAccount(id, name, checking_balance, saving_balance);
                 bankAccounts.add(bankAccount);
 
                 System.out.println(id +  "\t" +
                         name + "\t" +
-                        balance);
+                        checking_balance + "\t" + saving_balance);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -80,7 +81,7 @@ public class Database
     }
 
     public BankAccount authenticateAccount(String acctNumber, String pin) {
-        String sql = "SELECT id, name, balance FROM accounts WHERE id = ? and pin = ?";
+        String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id = ? and pin = ?";
 
         try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql))
         {
@@ -102,8 +103,9 @@ public class Database
             if (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                int balance = rs.getInt("balance");
-                return new BankAccount(id, name, balance);
+                int checking_balance = rs.getInt("balance");
+                int saving_balance = rs.getInt("balance_saving");
+                return new BankAccount(id, name, checking_balance, saving_balance);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
