@@ -27,6 +27,7 @@ public class DenominationPanel extends JPanel
         void onSelected(int currency);
     }
 
+    private NumberFormatter numberFormatter;
     private JFormattedTextField textField;
     private DenomPanelCallback userCallback;
 
@@ -104,10 +105,10 @@ public class DenominationPanel extends JPanel
         this.add(lblNewLabel_1);
 
         NumberFormat longFormat = NumberFormat.getIntegerInstance();
-        NumberFormatter numberFormatter = new NumberFormatterMod(longFormat);
-        numberFormatter.setValueClass(Long.class);
+        numberFormatter = new NumberFormatterMod(longFormat);
+        numberFormatter.setValueClass(Integer.class);
         numberFormatter.setAllowsInvalid(false);
-        numberFormatter.setMinimum(0l);
+        numberFormatter.setMinimum(0);
 
         textField = new JFormattedTextField(numberFormatter);
         textField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -133,8 +134,8 @@ public class DenominationPanel extends JPanel
 
     private int getValue() {
         try {
-            return Integer.parseInt(textField.getText());
-        } catch (NumberFormatException e) {
+            return (int)numberFormatter.stringToValue(textField.getText());
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -146,8 +147,9 @@ public class DenominationPanel extends JPanel
     }
 
     public void onButtonEnter(ActionEvent e) {
-        if (userCallback != null)
+        if (userCallback != null) {
             userCallback.onSelected(this.getValue());
+        }
     }
 
     private void onIncrementCurrency(ActionEvent event) {

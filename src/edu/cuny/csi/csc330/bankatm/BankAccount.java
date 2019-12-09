@@ -44,6 +44,10 @@ public class BankAccount
     }
 
     public String getFormattedBalance(AccountType accountType) {
-        return NumberFormat.getCurrencyInstance().format(getBalance(accountType) / 100.0);
+        return formatCurrency(getBalance(accountType));
+    }
+
+    public static String formatCurrency(int val) {
+        return NumberFormat.getCurrencyInstance().format(val / 100.0);
     }
 }

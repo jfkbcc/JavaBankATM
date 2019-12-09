@@ -4,6 +4,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
+
 public class Database
 {
     private Connection dbConnection = null;
@@ -114,25 +116,95 @@ public class Database
         return null;
     }
 
+    public BankAccount getBankAccount(int accountNumber) {
+        String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id = ?";
+
+        try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountNumber);
+            ResultSet rs  = pstmt.executeQuery();
+
+            // loop through the result set
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                int checking_balance = rs.getInt("balance");
+                int saving_balance = rs.getInt("balance_saving");
+                return new BankAccount(id, name, checking_balance, saving_balance);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
     public BankAccount createAccount(String name, String pin, int initialDeposit)
     {
         String accountNumber = "";
 
-        String sql = "INSERT INTO accounts (name, pin, balance) VALUES(?, ?, ?)";
-        try {
-            try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
-                pstmt.setString(1, name);
-                pstmt.setString(2, pin);
-                pstmt.setInt(3, initialDeposit);
+        String sql = "INSERT INTO accounts (name, pin, balance, balance_saving) VALUES(?, ?, ?, ?)";
+        try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, pin);
+            pstmt.setInt(3, initialDeposit);
+            pstmt.setInt(4, 0);
 
-                pstmt.executeUpdate();
-                ResultSet genky = pstmt.getGeneratedKeys();
-                accountNumber = Long.toString(genky.getLong(1));
-            }
+            pstmt.executeUpdate();
+            ResultSet genky = pstmt.getGeneratedKeys();
+            accountNumber = Long.toString(genky.getLong(1));
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return authenticateAccount(accountNumber, pin);
+    }
+
+    private boolean updateMoneyForAccount(int accountNumber, AccountType type, int currency)
+    {
+        String columnName = (type == AccountType.Checking ? "balance" : "balance_saving");
+
+        String sql = "UPDATE accounts SET " + columnName + " = ? WHERE id = ?";
+        try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
+            pstmt.setInt(1, currency);
+            pstmt.setInt(2, accountNumber);
+
+            int rowsUpdated = pstmt.executeUpdate();
+            return (rowsUpdated == 1);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * @param accountNumber
+     * @param accountType
+     * @param currency REMEMBER - this number is an integer, 1.00 is represented as 100.
+     *
+     * @return updated bank account if changed, otherwise null
+     */
+    public BankAccount adjustBalance(int accountNumber, AccountType accountType, int currency) {
+        BankAccount latestAccount = getBankAccount(accountNumber);
+        int cur_balance = latestAccount.getBalance(accountType);
+        int new_balance = cur_balance + currency;
+        boolean success = false;
+
+        // withdrawal
+        if (currency < 0) {
+            if (new_balance > 0) {
+                success = updateMoneyForAccount(accountNumber, accountType, new_balance);
+            }
+        }
+        else if (currency > 0) {
+            success = updateMoneyForAccount(accountNumber, accountType, new_balance);
+        }
+
+        if (success) {
+            return getBankAccount(accountNumber);
+        }
+
+        return null;
     }
 }

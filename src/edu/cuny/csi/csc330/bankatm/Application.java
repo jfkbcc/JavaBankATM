@@ -13,6 +13,7 @@ public class Application extends JFrame
     private Database db = new Database();
     private boolean authenticated = false;
     private BankAccount bankAccount = null;
+    private AccountType activeAccountType = AccountType.None;
 
     private Application()
     {
@@ -42,6 +43,7 @@ public class Application extends JFrame
     }
 
     public void logout() {
+        activeAccountType = AccountType.None;
         authenticated = false;
         bankAccount = null;
 
@@ -63,6 +65,8 @@ public class Application extends JFrame
 
     private void displayAccountSelection()
     {
+        activeAccountType = AccountType.None;
+
         SelectAccountTypePanel panel = new SelectAccountTypePanel();
         panel.setActionExit(e -> logout());
         panel.setActionSelected(e -> {
@@ -86,6 +90,8 @@ public class Application extends JFrame
             return;
         }
 
+        activeAccountType = accountType;
+
         BankAccountPanel panel = new BankAccountPanel(bankAccount, accountType);
         panel.setActionExit(e -> displayAccountSelection());
         panel.setActionSelected(e -> {
@@ -99,7 +105,8 @@ public class Application extends JFrame
 
     private void displayDenomPanel(String type)
     {
-        if (!type.equals("withdraw") && !type.equals("deposit")) {
+        if (!(type.equals("withdraw") || type.equals("deposit"))
+                || activeAccountType == AccountType.None) {
             logout();
             return;
         }
@@ -107,15 +114,24 @@ public class Application extends JFrame
         String ucType = StringUtils.capitalize(type);
 
         DenominationPanel panel = new DenominationPanel("Withdraw Amount");
-        panel.setCallBack(currency -> {
-            System.out.println(ucType + " " + currency + " from " + bankAccount.getName());
+        panel.setCallBack(value -> {
+            int currency = value * 100;
 
-            // TODO(joey): implement withdraw/deposit into database
-            if (type == "withdraw") {
+            System.out.println(ucType + " " + BankAccount.formatCurrency(currency) + " from " + bankAccount.getName());
 
+            if (type.equals("withdraw")) {
+                currency = -currency;
             }
-            else if (type == "deposit") {
 
+            BankAccount updatedAccount = db.adjustBalance(bankAccount.getId(), activeAccountType, currency);
+            if (updatedAccount == null) {
+                // Insufficient funds?
+                int predictedBalance = bankAccount.getBalance(activeAccountType) + currency;
+                System.out.println("Insufficient funds for withdrawl! Balance would be " + BankAccount.formatCurrency(predictedBalance));
+            }
+            else {
+                // Success, maybe display a popup message
+                bankAccount = updatedAccount;
             }
 
             displayAccountSelection();
