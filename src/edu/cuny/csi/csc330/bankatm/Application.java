@@ -2,6 +2,7 @@ package edu.cuny.csi.csc330.bankatm;
 
 import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
 import edu.cuny.csi.csc330.bankatm.panels.BankAccountPanel;
+import edu.cuny.csi.csc330.bankatm.panels.NumberPanel;
 import edu.cuny.csi.csc330.bankatm.panels.SelectAccountTypePanel;
 import edu.cuny.csi.csc330.bankatm.panels.LoginPanel;
 
@@ -98,28 +99,33 @@ public class Application extends JFrame
 
     private void displayLoginDialog()
     {
-        String accountNumber = NumberDialog.showDialog("Account Number", "Enter your Account Number");
-        if (accountNumber.isEmpty()) {
-            logout();
-            return;
-        }
+        NumberPanel numberPanel = new NumberPanel("Enter your Account Number");
+        numberPanel.setCallBack((accountNumber) -> {
+            if (accountNumber.isEmpty()) {
+                logout();
+                return;
+            }
 
-        String pinNumber = NumberDialog.showDialog("Pin Number", "Enter your Pin Number");
+            NumberPanel pinPanel = new NumberPanel("Enter your Pin Number");
+            pinPanel.setCallBack((pinNumber) -> {
+                BankAccount ba = db.authenticateAccount(accountNumber, pinNumber);
+                if (ba == null) {
+                    JOptionPane.showMessageDialog(this, "Authentication failed, logging out");
+                    logout();
+                    return;
+                }
 
-        BankAccount ba = db.authenticateAccount(accountNumber, pinNumber);
-        if (ba == null) {
-            JOptionPane.showMessageDialog(this, "Authentication failed, logging out");
-            logout();
-            return;
-        }
+                bankAccount = ba;
+                authenticated = true;
 
-        bankAccount = ba;
-        authenticated = true;
+                System.out.println("Logged in to " + ba.getName());
+                System.out.println("Balance: " + ba.getFormattedBalance(AccountType.Checking));
 
-        System.out.println("Logged in to " + ba.getName());
-        System.out.println("Balance: " + ba.getFormattedBalance(AccountType.Checking));
-
-        displayAccountSelection();
+                displayAccountSelection();
+            });
+            setContentPanel(pinPanel);
+        });
+        setContentPanel(numberPanel);
     }
 
     private void displayNewCustomerDialog()

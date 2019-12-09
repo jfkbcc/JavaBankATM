@@ -12,6 +12,7 @@ public class LoginPanel extends JPanel
     public LoginPanel()
     {
         super();
+        this.setVisible(false);
 
         setBounds(0, 0, 450, 300);
         setLayout(null);
@@ -35,6 +36,7 @@ public class LoginPanel extends JPanel
         lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
         lblNewLabel.setBounds(10, 0, 414, 65);
         this.add(lblNewLabel);
+        this.setVisible(true);
     }
 
     public void setActionExistingCustomer(ActionListener listener) {
@@ -55,6 +57,7 @@ public class LoginPanel extends JPanel
                     LoginPanel window = new LoginPanel();
 
                     JFrame frame = new JFrame();
+                    frame.setVisible(false);
                     frame.setBounds(100, 100, 450, 300);
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.getContentPane().setLayout(null);
