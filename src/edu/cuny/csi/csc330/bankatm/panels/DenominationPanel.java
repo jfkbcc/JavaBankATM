@@ -10,8 +10,6 @@ import java.text.ParseException;
 
 public class DenominationPanel extends JPanel
 {
-    private JFormattedTextField textField;
-
     class NumberFormatterMod extends NumberFormatter
     {
         public NumberFormatterMod(NumberFormat format) {
@@ -25,7 +23,14 @@ public class DenominationPanel extends JPanel
         }
     }
 
-    public DenominationPanel()
+    public interface DenomPanelCallback {
+        void onSelected(int currency);
+    }
+
+    private JFormattedTextField textField;
+    private DenomPanelCallback userCallback;
+
+    public DenominationPanel(String text)
     {
         super();
 
@@ -59,7 +64,7 @@ public class DenominationPanel extends JPanel
         btnNewButton_2.addActionListener(this::onIncrementCurrency);
         this.add(btnNewButton_2);
 
-        JLabel lblNewLabel = new JLabel("Withdraw Amount");
+        JLabel lblNewLabel = new JLabel(text);
         lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 28));
         lblNewLabel.setBounds(10, 11, 414, 44);
@@ -95,7 +100,7 @@ public class DenominationPanel extends JPanel
         JLabel lblNewLabel_1 = new JLabel("Enter Exact Amount");
         lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel_1.setFont(new Font("Dialog", Font.BOLD, 14));
-        lblNewLabel_1.setBounds(117, 194, 181, 22);
+        lblNewLabel_1.setBounds(127, 194, 181, 22);
         this.add(lblNewLabel_1);
 
         NumberFormat longFormat = NumberFormat.getIntegerInstance();
@@ -106,7 +111,7 @@ public class DenominationPanel extends JPanel
 
         textField = new JFormattedTextField(numberFormatter);
         textField.setHorizontalAlignment(SwingConstants.CENTER);
-        textField.setBounds(117, 225, 96, 25);
+        textField.setBounds(167, 225, 96, 25);
         textField.setColumns(10);
         textField.setText("0");
         this.add(textField);
@@ -114,15 +119,41 @@ public class DenominationPanel extends JPanel
         JButton btnNewButton_3 = new JButton("Enter");
         btnNewButton_3.setForeground(new Color(0, 0, 0));
         btnNewButton_3.setFont(new Font("Dialog", Font.BOLD, 14));
-        btnNewButton_3.setBounds(224, 226, 74, 23);
+        btnNewButton_3.setBounds(270, 226, 74, 23);
+        btnNewButton_3.addActionListener(this::onButtonEnter);
         this.add(btnNewButton_3);
+
+        JButton btnNewButton_4 = new JButton("Clear");
+        btnNewButton_4.setForeground(new Color(0, 0, 0));
+        btnNewButton_4.setFont(new Font("Dialog", Font.BOLD, 14));
+        btnNewButton_4.setBounds(90, 226, 74, 23);
+        btnNewButton_4.addActionListener(this::onButtonClear);
+        this.add(btnNewButton_4);
     }
 
-    private void onIncrementCurrency(ActionEvent event)
-    {
+    private int getValue() {
+        try {
+            return Integer.parseInt(textField.getText());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    private void onButtonClear(ActionEvent event) {
+        textField.setText("0");
+    }
+
+    public void onButtonEnter(ActionEvent e) {
+        if (userCallback != null)
+            userCallback.onSelected(this.getValue());
+    }
+
+    private void onIncrementCurrency(ActionEvent event) {
         try {
             int increment = Integer.parseInt(event.getActionCommand());
-            int val = Integer.parseInt(textField.getText());
+            int val = this.getValue();
 
             textField.setText(String.valueOf(val + increment));
         } catch (NumberFormatException e) {
@@ -130,13 +161,8 @@ public class DenominationPanel extends JPanel
         }
     }
 
-    public void setActionExit(ActionListener listener) {
-//        btnExit.addActionListener(listener);
-    }
-
-    public void setActionSelected(ActionListener listener) {
-//        btnDeposit.addActionListener(listener);
-//        btnWithdraw.addActionListener(listener);
+    public void setCallBack(DenomPanelCallback cb) {
+        this.userCallback = cb;
     }
 
     /**
@@ -146,7 +172,7 @@ public class DenominationPanel extends JPanel
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    DenominationPanel window = new DenominationPanel();
+                    DenominationPanel window = new DenominationPanel("Withdraw Amount");
 
                     JFrame frame = new JFrame();
                     frame.setBounds(100, 100, 450, 300);

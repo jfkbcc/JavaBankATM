@@ -1,10 +1,8 @@
 package edu.cuny.csi.csc330.bankatm;
 
+import com.sun.xml.internal.ws.util.StringUtils;
 import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
-import edu.cuny.csi.csc330.bankatm.panels.BankAccountPanel;
-import edu.cuny.csi.csc330.bankatm.panels.NumberPanel;
-import edu.cuny.csi.csc330.bankatm.panels.SelectAccountTypePanel;
-import edu.cuny.csi.csc330.bankatm.panels.LoginPanel;
+import edu.cuny.csi.csc330.bankatm.panels.*;
 
 import javax.swing.*;
 
@@ -92,7 +90,35 @@ public class Application extends JFrame
         panel.setActionExit(e -> displayAccountSelection());
         panel.setActionSelected(e -> {
             String cmdType = e.getActionCommand();
+
             System.out.println("Action `" + cmdType + "` button clicked!");
+            displayDenomPanel(cmdType);
+        });
+        this.setContentPanel(panel);
+    }
+
+    private void displayDenomPanel(String type)
+    {
+        if (!type.equals("withdraw") && !type.equals("deposit")) {
+            logout();
+            return;
+        }
+
+        String ucType = StringUtils.capitalize(type);
+
+        DenominationPanel panel = new DenominationPanel("Withdraw Amount");
+        panel.setCallBack(currency -> {
+            System.out.println(ucType + " " + currency + " from " + bankAccount.getName());
+
+            // TODO(joey): implement withdraw/deposit into database
+            if (type == "withdraw") {
+
+            }
+            else if (type == "deposit") {
+
+            }
+
+            displayAccountSelection();
         });
         this.setContentPanel(panel);
     }

@@ -6,11 +6,11 @@ import java.awt.event.ActionEvent;
 
 public class NumberPanel extends JPanel
 {
-    public interface UserCallback {
-        void UserSelectedCb(String value);
+    public interface NumberPanelCallback {
+        void onSelected(String value);
     }
 
-    UserCallback userCallback = null;
+    NumberPanelCallback userCallback = null;
 
     JLabel lbLabel0;
     JTextField tf;
@@ -242,10 +242,10 @@ public class NumberPanel extends JPanel
 
     public void onButtonEnter(ActionEvent e) {
         if (userCallback != null)
-            userCallback.UserSelectedCb(getValue());
+            userCallback.onSelected(getValue());
     }
 
-    public void setCallBack(UserCallback cb) {
+    public void setCallBack(NumberPanelCallback cb) {
         userCallback = cb;
     }
 
