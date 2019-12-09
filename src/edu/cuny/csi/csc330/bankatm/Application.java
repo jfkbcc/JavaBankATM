@@ -111,15 +111,17 @@ public class Application extends JFrame
             return;
         }
 
+        boolean isWithdraw = type.equals("withdraw");
         String ucType = StringUtils.capitalize(type);
 
-        DenominationPanel panel = new DenominationPanel("Withdraw Amount");
+        DenominationPanel panel = new DenominationPanel(ucType + " Amount");
         panel.setCallBack(value -> {
             int currency = value * 100;
+            String formattedCurrency = BankAccount.formatCurrency(currency);
 
-            System.out.println(ucType + " " + BankAccount.formatCurrency(currency) + " from " + bankAccount.getName());
+            System.out.println(ucType + " " + formattedCurrency + " from " + bankAccount.getName());
 
-            if (type.equals("withdraw")) {
+            if (isWithdraw) {
                 currency = -currency;
             }
 
@@ -127,11 +129,27 @@ public class Application extends JFrame
             if (updatedAccount == null) {
                 // Insufficient funds?
                 int predictedBalance = bankAccount.getBalance(activeAccountType) + currency;
-                System.out.println("Insufficient funds for withdrawl! Balance would be " + BankAccount.formatCurrency(predictedBalance));
-            }
-            else {
+                if (predictedBalance < 0) {
+                    JOptionPane.showMessageDialog(this, "Insufficient funds for withdrawal!");
+                    System.out.println("Insufficient funds for withdraw! Balance would be " + BankAccount.formatCurrency(predictedBalance));
+                }
+            } else {
                 // Success, maybe display a popup message
                 bankAccount = updatedAccount;
+
+                StringBuilder successMsg = new StringBuilder();
+                if (isWithdraw) {
+                    successMsg.append("You withdraw ").append(formattedCurrency).append(" from your ");
+                } else {
+                    successMsg.append("You deposited ").append(formattedCurrency).append(" into your ");
+                }
+
+                successMsg
+                        .append(BankAccount.getAccountType(activeAccountType))
+                        .append(" account. Available balance: ")
+                        .append(bankAccount.getFormattedBalance(activeAccountType));
+
+                JOptionPane.showMessageDialog(this, successMsg.toString());
             }
 
             displayAccountSelection();

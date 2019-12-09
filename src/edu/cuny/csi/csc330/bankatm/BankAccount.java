@@ -13,8 +13,16 @@ public class BankAccount
     public static AccountType getAccountType(String accountType) {
         switch (accountType.toLowerCase()) {
             case "checking":    return AccountType.Checking;
-            case "savings":      return AccountType.Savings;
+            case "savings":     return AccountType.Savings;
             default:            return AccountType.None;
+        }
+    }
+
+    public static String getAccountType(AccountType accountType) {
+        switch (accountType) {
+            case Checking:      return "checking";
+            case Savings:       return "savings";
+            default:            return "";
         }
     }
 
