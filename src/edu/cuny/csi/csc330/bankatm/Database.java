@@ -49,7 +49,7 @@ public class Database
     public ArrayList<BankAccount> getAccounts() {
         String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id > ?";
 
-        ArrayList<BankAccount> bankAccounts = new ArrayList<BankAccount>();
+        ArrayList<BankAccount> bankAccounts = new ArrayList<>();
 
         try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql))
         {

@@ -10,7 +10,6 @@ public class Application extends JFrame
     final static String APP_TITLE = "Bank ATM";
 
     private Database db = new Database();
-    private boolean authenticated = false;
     private BankAccount bankAccount = null;
     private BankAccountType activeAccountType = BankAccountType.None;
 
@@ -43,7 +42,6 @@ public class Application extends JFrame
 
     public void logout() {
         activeAccountType = BankAccountType.None;
-        authenticated = false;
         bankAccount = null;
 
         displayStartScreen();
@@ -52,12 +50,8 @@ public class Application extends JFrame
     private void displayStartScreen()
     {
         LoginPanel panel = new LoginPanel();
-        panel.setActionExistingCustomer(e -> {
-            displayLoginDialog();
-        });
-        panel.setActionNewCustomer(e -> {
-            displayNewCustomerDialog();
-        });
+        panel.setActionExistingCustomer(e -> displayLoginDialog());
+        panel.setActionNewCustomer(e -> displayNewCustomerDialog());
 
         this.setContentPanel(panel);
     }
@@ -175,7 +169,6 @@ public class Application extends JFrame
                 }
 
                 bankAccount = ba;
-                authenticated = true;
 
                 System.out.println("Logged in to " + ba.getName());
                 System.out.println("Balance: " + ba.getFormattedBalance(BankAccountType.Checking));

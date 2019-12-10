@@ -206,7 +206,7 @@ public class NumberPanel extends JPanel
         gbPanel0.setConstraints(btButNumDel, gbcPanel0);
         this.add(btButNumDel);
 
-        JButton buttons[] = {
+        JButton[] buttons = {
                 btButNum0,
                 btButNum1, btButNum2, btButNum3,
                 btButNum4, btButNum5, btButNum6,
