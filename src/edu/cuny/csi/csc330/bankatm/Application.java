@@ -1,7 +1,6 @@
 package edu.cuny.csi.csc330.bankatm;
 
 import com.sun.xml.internal.ws.util.StringUtils;
-import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
 import edu.cuny.csi.csc330.bankatm.panels.*;
 
 import javax.swing.*;
@@ -13,7 +12,7 @@ public class Application extends JFrame
     private Database db = new Database();
     private boolean authenticated = false;
     private BankAccount bankAccount = null;
-    private AccountType activeAccountType = AccountType.None;
+    private BankAccountType activeAccountType = BankAccountType.None;
 
     private Application()
     {
@@ -43,7 +42,7 @@ public class Application extends JFrame
     }
 
     public void logout() {
-        activeAccountType = AccountType.None;
+        activeAccountType = BankAccountType.None;
         authenticated = false;
         bankAccount = null;
 
@@ -65,21 +64,21 @@ public class Application extends JFrame
 
     private void displayAccountSelection()
     {
-        activeAccountType = AccountType.None;
+        activeAccountType = BankAccountType.None;
 
         SelectAccountTypePanel panel = new SelectAccountTypePanel();
         panel.setActionExit(e -> logout());
         panel.setActionSelected(e -> {
             String selected = e.getActionCommand();
-            displayBankScreen(BankAccount.getAccountType(selected));
+            displayBankScreen(BankAccountType.getAccountType(selected));
         });
 
         this.setContentPanel(panel);
     }
 
-    private void displayBankScreen(AccountType accountType)
+    private void displayBankScreen(BankAccountType accountType)
     {
-        if (accountType == AccountType.None) {
+        if (accountType == BankAccountType.None) {
             logout();
             System.err.println("Invalid bank account type `" + accountType.toString() + "`, valid account types: checking, savings");
             return;
@@ -106,7 +105,7 @@ public class Application extends JFrame
     private void displayDenomPanel(String type)
     {
         if (!(type.equals("withdraw") || type.equals("deposit"))
-                || activeAccountType == AccountType.None) {
+                || activeAccountType == BankAccountType.None) {
             logout();
             return;
         }
@@ -145,7 +144,7 @@ public class Application extends JFrame
                 }
 
                 successMsg
-                        .append(BankAccount.getAccountType(activeAccountType))
+                        .append(BankAccountType.getAccountType(activeAccountType))
                         .append(" account. Available balance: ")
                         .append(bankAccount.getFormattedBalance(activeAccountType));
 
@@ -179,7 +178,7 @@ public class Application extends JFrame
                 authenticated = true;
 
                 System.out.println("Logged in to " + ba.getName());
-                System.out.println("Balance: " + ba.getFormattedBalance(AccountType.Checking));
+                System.out.println("Balance: " + ba.getFormattedBalance(BankAccountType.Checking));
 
                 displayAccountSelection();
             });

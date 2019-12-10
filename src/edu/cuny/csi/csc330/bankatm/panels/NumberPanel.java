@@ -40,7 +40,7 @@ public class NumberPanel extends JPanel
         lbLabel0 = new JLabel(text);
         gbcPanel0.gridx = 6;
         gbcPanel0.gridy = 1;
-        gbcPanel0.gridwidth = 2;
+        gbcPanel0.gridwidth = 4;
         gbcPanel0.gridheight = 1;
         gbcPanel0.fill = GridBagConstraints.BOTH;
         gbcPanel0.weightx = 1;
@@ -220,8 +220,6 @@ public class NumberPanel extends JPanel
 
         btButNumDel.addActionListener(this::onButtonDelete);
         btButNumEnter.addActionListener(this::onButtonEnter);
-
-        setVisible(true);
     }
 
     public String getValue() {

@@ -1,6 +1,7 @@
 package edu.cuny.csi.csc330.bankatm.panels;
 
 import edu.cuny.csi.csc330.bankatm.BankAccount;
+import edu.cuny.csi.csc330.bankatm.BankAccountType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ public class BankAccountPanel extends JPanel
     private JButton btnDeposit;
     private JButton btnExit;
 
-    public BankAccountPanel(BankAccount bankAccount, BankAccount.AccountType accountType)
+    public BankAccountPanel(BankAccount bankAccount, BankAccountType accountType)
     {
         super();
 
@@ -73,7 +74,7 @@ public class BankAccountPanel extends JPanel
                 try {
                     BankAccount ba = new BankAccount(1, "joey", 1500, 300);
 
-                    BankAccountPanel window = new BankAccountPanel(ba, BankAccount.AccountType.Checking);
+                    BankAccountPanel window = new BankAccountPanel(ba, BankAccountType.Checking);
 
                     JFrame frame = new JFrame();
                     frame.setBounds(100, 100, 450, 300);

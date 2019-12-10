@@ -4,28 +4,6 @@ import java.text.NumberFormat;
 
 public class BankAccount
 {
-    public enum AccountType {
-        None,
-        Checking,
-        Savings
-    };
-
-    public static AccountType getAccountType(String accountType) {
-        switch (accountType.toLowerCase()) {
-            case "checking":    return AccountType.Checking;
-            case "savings":     return AccountType.Savings;
-            default:            return AccountType.None;
-        }
-    }
-
-    public static String getAccountType(AccountType accountType) {
-        switch (accountType) {
-            case Checking:      return "checking";
-            case Savings:       return "savings";
-            default:            return "";
-        }
-    }
-
     private int id;
     private int checkingBalance;
     private int savingsBalance;
@@ -47,11 +25,11 @@ public class BankAccount
         return name;
     }
 
-    public int getBalance(AccountType accountType) {
-        return (accountType == AccountType.Checking ? this.checkingBalance : this.savingsBalance);
+    public int getBalance(BankAccountType accountType) {
+        return (accountType == BankAccountType.Checking ? this.checkingBalance : this.savingsBalance);
     }
 
-    public String getFormattedBalance(AccountType accountType) {
+    public String getFormattedBalance(BankAccountType accountType) {
         return formatCurrency(getBalance(accountType));
     }
 

@@ -2,9 +2,6 @@ package edu.cuny.csi.csc330.bankatm;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
-
-import edu.cuny.csi.csc330.bankatm.BankAccount.AccountType;
 
 public class Database
 {
@@ -160,9 +157,9 @@ public class Database
         return authenticateAccount(accountNumber, pin);
     }
 
-    private boolean updateMoneyForAccount(int accountNumber, AccountType type, int currency)
+    private boolean updateMoneyForAccount(int accountNumber, BankAccountType type, int currency)
     {
-        String columnName = (type == AccountType.Checking ? "balance" : "balance_saving");
+        String columnName = (type == BankAccountType.Checking ? "balance" : "balance_saving");
 
         String sql = "UPDATE accounts SET " + columnName + " = ? WHERE id = ?";
         try (PreparedStatement pstmt  = dbConnection.prepareStatement(sql)) {
@@ -185,7 +182,7 @@ public class Database
      *
      * @return updated bank account if changed, otherwise null
      */
-    public BankAccount adjustBalance(int accountNumber, AccountType accountType, int currency) {
+    public BankAccount adjustBalance(int accountNumber, BankAccountType accountType, int currency) {
         BankAccount latestAccount = getBankAccount(accountNumber);
         int cur_balance = latestAccount.getBalance(accountType);
         int new_balance = cur_balance + currency;
