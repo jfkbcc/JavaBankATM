@@ -67,10 +67,6 @@ public class Database
 
                 BankAccount bankAccount = new BankAccount(id, name, checking_balance, saving_balance);
                 bankAccounts.add(bankAccount);
-
-                System.out.println(id +  "\t" +
-                        name + "\t" +
-                        checking_balance + "\t" + saving_balance);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -176,8 +172,8 @@ public class Database
     }
 
     /**
-     * @param accountNumber
-     * @param accountType
+     * @param accountNumber int
+     * @param accountType BankAccountType
      * @param currency REMEMBER - this number is an integer, 1.00 is represented as 100.
      *
      * @return updated bank account if changed, otherwise null
@@ -186,22 +182,31 @@ public class Database
         BankAccount latestAccount = getBankAccount(accountNumber);
         int cur_balance = latestAccount.getBalance(accountType);
         int new_balance = cur_balance + currency;
-        boolean success = false;
 
-        // withdrawal
-        if (currency < 0) {
-            if (new_balance > 0) {
-                success = updateMoneyForAccount(accountNumber, accountType, new_balance);
+        // currency > 0 -> deposit
+        // currency < 0 -> withdraw
+        if (currency > 0 || (currency < 0 && new_balance > 0)) {
+            boolean success = updateMoneyForAccount(accountNumber, accountType, new_balance);
+            if (success) {
+                return getBankAccount(accountNumber);
             }
-        }
-        else if (currency > 0) {
-            success = updateMoneyForAccount(accountNumber, accountType, new_balance);
-        }
-
-        if (success) {
-            return getBankAccount(accountNumber);
         }
 
         return null;
+    }
+
+    public static void main(final String[] args) {
+        Database db = new Database();
+        if (!db.open("bankdata")) {
+            throw new RuntimeException("Failed to connect to SQLite");
+        }
+
+        System.out.println("Accounts in database:");
+        for (BankAccount account : db.getAccounts()) {
+            System.out.println(account.getId() +  "\t\t" +
+                    account.getName() + "\t\t" +
+                    account.getFormattedBalance(BankAccountType.Checking) + "\t\t" +
+                    account.getFormattedBalance(BankAccountType.Savings));
+        }
     }
 }
