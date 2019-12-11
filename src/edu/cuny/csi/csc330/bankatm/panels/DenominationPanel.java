@@ -30,6 +30,7 @@ public class DenominationPanel extends JPanel
     private JFormattedTextField textField;
     private DenomPanelCallback userCallback;
 
+    
     public DenominationPanel(String text)
     {
         super();
@@ -140,7 +141,7 @@ public class DenominationPanel extends JPanel
 
         return 0;
     }
-
+    
     private void onButtonClear(ActionEvent event) {
         textField.setText("0");
     }
@@ -161,7 +162,7 @@ public class DenominationPanel extends JPanel
             e.printStackTrace();
         }
     }
-
+    
     public void setCallBack(DenomPanelCallback cb) {
         this.userCallback = cb;
     }
