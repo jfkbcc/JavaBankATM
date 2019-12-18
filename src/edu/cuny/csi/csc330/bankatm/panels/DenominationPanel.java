@@ -109,6 +109,7 @@ public class DenominationPanel extends JPanel
         numberFormatter.setValueClass(Integer.class);
         numberFormatter.setAllowsInvalid(false);
         numberFormatter.setMinimum(0);
+        numberFormatter.setMaximum(1000000);
 
         textField = new JFormattedTextField(numberFormatter);
         textField.setHorizontalAlignment(SwingConstants.CENTER);

@@ -9,12 +9,20 @@ public class BankAccount
     private int savingsBalance;
     private String name;
 
-    public BankAccount(int id, String name, int checking, int saving)
+    /**
+     * Construct a read-only BankAccount
+     *
+     * @param id int
+     * @param name String
+     * @param checking_balance int
+     * @param saving_balance int
+     */
+    public BankAccount(int id, String name, int checking_balance, int saving_balance)
     {
         this.id = id;
         this.name = name;
-        this.checkingBalance = checking;
-        this.savingsBalance = saving;
+        this.checkingBalance = checking_balance;
+        this.savingsBalance = saving_balance;
     }
 
     public int getId() {

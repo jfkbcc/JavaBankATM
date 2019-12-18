@@ -11,6 +11,9 @@ public class Database {
 
 	}
 
+	/**
+	 * Close database connection
+	 */
 	public void close() {
 		if (dbConnection != null) {
 			try {
@@ -23,6 +26,12 @@ public class Database {
 		}
 	}
 
+	/**
+	 * Opens an sqlite database with the filename (automatically appends .db)
+	 *
+	 * @param databaseName database_name (excluding .db)
+	 * @return success
+	 */
 	public boolean open(String databaseName) {
 		if (dbConnection == null) {
 			try {
@@ -41,10 +50,20 @@ public class Database {
 		return false;
 	}
 
+	/**
+	 * Check if the database connection has been closed
+	 *
+	 * @return true if not connected
+	 */
 	public boolean isClosed() {
 		return (dbConnection == null);
 	}
 
+	/**
+	 * Get an array of BankAccounts in the database
+	 *
+	 * @return BankAccount[]
+	 */
 	public ArrayList<BankAccount> getAccounts() {
 		String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id > ?";
 
@@ -73,6 +92,13 @@ public class Database {
 		return bankAccounts;
 	}
 
+	/**
+	 * Authenticate a bank account with the given account number and pin
+	 *
+	 * @param acctNumber id
+	 * @param pin pin
+	 * @return BankAccount
+	 */
 	public BankAccount authenticateAccount(String acctNumber, String pin) {
 		String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id = ? and pin = ?";
 
@@ -106,6 +132,12 @@ public class Database {
 		return null;
 	}
 
+	/**
+	 * Get a bank account by the specified account number
+	 *
+	 * @param accountNumber id
+	 * @return BankAccount
+	 */
 	public BankAccount getBankAccount(int accountNumber) {
 		String sql = "SELECT id, name, balance, balance_saving FROM accounts WHERE id = ?";
 
@@ -129,11 +161,20 @@ public class Database {
 		return null;
 	}
 
+	/**
+	 * Create a new bank account with the given name, pin, and initial deposit
+	 *
+	 * @param name full name
+	 * @param pin pin
+	 * @param initialDeposit initial deposit
+	 * @return BankAccount
+	 */
 	public BankAccount createAccount(String name, String pin, int initialDeposit) {
 		String accountNumber = "";
 
-		String sql = "INSERT INTO accounts (id,name, pin, balance, balance_saving) VALUES(?,?, ?, ?, ?)";
+		String sql = "INSERT INTO accounts (id, name, pin, balance, balance_saving) VALUES(?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
+			// not sure why this was changed, but the database should of been auto-incrementing id
 			pstmt.setInt(1, getNumAccounts() + 1);
 			pstmt.setString(2, name);
 			pstmt.setString(3, pin);
@@ -150,8 +191,18 @@ public class Database {
 		return authenticateAccount(accountNumber, pin);
 	}
 
-	private boolean updateMoneyForAccount(int accountNumber, BankAccountType type, int currency) {
-		String columnName = (type == BankAccountType.Checking ? "balance" : "balance_saving");
+	/**
+	 * Update the currency in a checking or savings account
+	 *
+	 * @param accountNumber int
+	 * @param accountType   BankAccountType
+	 * @param currency      REMEMBER - this number is an integer, 1.00 is
+	 *                      represented as 100.
+	 *
+	 * @return true/false
+	 */
+	private boolean updateMoneyForAccount(int accountNumber, BankAccountType accountType, int currency) {
+		String columnName = (accountType == BankAccountType.Checking ? "balance" : "balance_saving");
 
 		String sql = "UPDATE accounts SET " + columnName + " = ? WHERE id = ?";
 		try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
@@ -168,6 +219,9 @@ public class Database {
 	}
 
 	/**
+	 * The only public method to adjust funds on a users account, does not allow directly setting
+	 * the value. Instead it only increments or decrements a value from the existing balance.
+	 *
 	 * @param accountNumber int
 	 * @param accountType   BankAccountType
 	 * @param currency      REMEMBER - this number is an integer, 1.00 is
